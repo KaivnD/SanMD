@@ -19,11 +19,7 @@ if(!is_user_logged_in()){
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/style.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/font-awesome.min.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/github.min.css");?>">
-
-    <script src="<?php getSanMDFile("statics/js/highlight.min.js");?>"></script>
-
-    <script src="<?php getSanMDFile("statics/js/simplemde.min.js");?>"></script>
-    <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/bootstrap.min.css");?>">
 </head>
 <body>
     <!--loading page-->
@@ -44,6 +40,11 @@ if(!is_user_logged_in()){
     <div class="modal-overlay"></div>
 
     <script src="<?php getSanMDFile("statics/js/jquery.min.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/bootstrap.min.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/highlight.min.js");?>"></script>
+
+    <script src="<?php getSanMDFile("statics/js/simplemde.min.js");?>"></script>
     <script>
         let contentUrl = "/wp-content/plugins/SanMD/actions/processContents.php";
         let loading = $("#loadingPage");
