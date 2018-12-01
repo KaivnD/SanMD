@@ -149,8 +149,8 @@ h3.main-title {
     }
 }
 .modal {
-    position: relative;
-    display: block;
+    position: relative !important;
+    display: block !important;
     vertical-align: middle;
     text-align: center;
     overflow:unset;

@@ -15,11 +15,11 @@ if(!is_user_logged_in()){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo bloginfo('name');?> | MarkDown编辑器</title>
-    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/simplemde.min.css");?>">
+
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/san.modal.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/style.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/font-awesome.min.css");?>">
-    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/github.min.css");?>">
+
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/bootstrap.min.css");?>">
 </head>
 <body>
@@ -40,16 +40,55 @@ if(!is_user_logged_in()){
         </div>
     <div class="modal-overlay"></div>
 
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">                        
+                        <button type="button" id="addDoc" class="btn btn-default"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                        <button type="button" id="delDoc" class="btn btn-default"><i class="fa fa-minus" aria-hidden="true"></i></button>
+                        <button type="button" id="editDoc" class="btn btn-default"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                        <button type="button" id="submitDoc" class="btn btn-default"><i class="fa fa-check" aria-hidden="true"></i></button>
+                        <h3 class="text-right k-panel-title">NCFZ | MarkDown</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>...</p>
+                    </div>
+
+                    <table class="table table-hover">
+                    <thead>
+                        <tr>
+                        <th>#</th>
+                        <th>名字</th>
+                        <th>时间</th>
+                        <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docTable">
+
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="<?php getSanMDFile("statics/js/jquery.min.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/bootstrap.min.js");?>"></script>
-    <script src="<?php getSanMDFile("statics/js/highlight.min.js");?>"></script>
 
-    <script src="<?php getSanMDFile("statics/js/simplemde.min.js");?>"></script>
     <script>
         let contentUrl = "/wp-content/plugins/SanMD/actions/processContents.php";
         let loading = $("#loadingPage");
         let modal = $(".modal-body");
+        let docTable = $("#docTable");
+        let selectedRow;
+
+        let editDoc = $("#editDoc");
+        let addDoc = $("#addDoc");
+        let delDocBtn = $("#delDoc");
+
         $modal = $('#md1');
         $overlay = $('.modal-overlay');
         function closeModal(){
@@ -71,14 +110,9 @@ if(!is_user_logged_in()){
         });
 
         window.onload = function (){
-
-            let body = $("body");
-            body.append('<textarea style="display:none;"></textarea>');
-
             let postData = {
-                "action":"getContent",
-                "uid":'<?php echo get_current_user_id();?>',
-                "docID":'<?php echo $docID;?>'
+                "action":"getDocs",
+                "uid":'<?php echo get_current_user_id();?>'
             };
             new SanRequest({
                 type: "post",
@@ -90,38 +124,20 @@ if(!is_user_logged_in()){
                     if (res.stat === 0) {
                         alert(res.msg);
                     }else{
-                        editorHandle(res.content);
+                        setDocs(res.docs);
                     }
                 }
-            });                     
-        };
+            });
+            
+            editDoc.click(function(){
+                if(selectedRow === undefined){
+                    alert("请选择需要编辑的文档");
+                }else{
+                    window.location.href = '<?php echo $editorUrl;?>' + "?docID=" + selectedRow;
+                }
+            });
 
-        function editorHandle(content){
-            var simplemde = new SimpleMDE({
-                autoDownloadFontAwesome:false,
-                autofocus: true,
-                placeholder: "整点动静...",
-                spellChecker:false,
-                initialValue:content,
-                renderingConfig:{
-                    codeSyntaxHighlighting:true
-                },
-                hideIcons: ["guide","unordered-list","ordered-list","quote","heading"],    
-                showIcons: ["code"]                
-            });
-            simplemde.toggleFullScreen();
-            let editorToolbar = $(".editor-toolbar");
-            editorToolbar.prepend('<i class="separator">|</i>');
-            editorToolbar.prepend('<a title="保存" id="saveMD" tabindex="-1" class="fa fa-save"></a>');
-            editorToolbar.prepend('<a title="新建" id="newMD" tabindex="-1" class="fa fa-plus"></a>');
-            editorToolbar.prepend('<a title="返回" id="goBack" tabindex="-1" class="fa fa-arrow-left"></a>');
-            let saveBtn = $("#saveMD");
-            let newBtn = $("#newMD");
-            let goBack = $("#goBack");
-            saveBtn.click(function (){
-                saveContent(simplemde.value());
-            });
-            newBtn.click(function(){
+            addDoc.click(function(){
                 modal.html("");
                 let userName = document.createElement("input");
                 userName.type = "username";
@@ -135,33 +151,67 @@ if(!is_user_logged_in()){
                     let titleVal = $("#docName").val();
                     console.log(titleVal);
                     newDoc(titleVal);
-                });
+                }); 
             });
-            goBack.click(function(){
-                window.location.href = '<?php echo $docsUrl;?>';
+
+            delDocBtn.click(function(){
+                if(selectedRow === undefined){
+                    alert("请选择需要删除的文档");
+                }else{
+                    modal.html("");
+                
+                    modal.append('<div><h3>确定删除该文件？</h3><a class="fancy-btn" id="docGo">确认</a></div>');
+                    openModal();
+                    $('#docGo').click(function(){
+                        delDoc(selectedRow);
+                    }); 
+                }
+
             });
             loading.css("display","none");
+        };
+
+        function setDocs(docs){
+            for(let i = 0; i < docs.length; i ++){
+                let doc = docs[i];
+
+                let index = i + 1;
+
+                let docRow = document.createElement('tr');
+                docRow.setAttribute("data-doc",doc.id);
+
+                let docIndex = document.createElement('th');
+                docIndex.innerText = index;
+
+                let docTitle = document.createElement('td');
+                docTitle.innerText = doc.title;
+
+                let docTime = document.createElement('td');
+                docTime.innerText = doc.time;
+
+                let docStat = document.createElement('td');
+                docStat.innerText = doc.stat;
+
+                docRow.appendChild(docIndex);
+                docRow.appendChild(docTitle);
+                docRow.appendChild(docTime);
+                docRow.appendChild(docStat);
+                
+                docTable.append(docRow);
+
+                docRow.onclick = function(){                   
+                    checkTabRow();
+                    this.className = "info";                 
+                    selectedRow = this.getAttribute("data-doc");
+                }
+            }
         }
 
-        function saveContent(content){
-            let postData = {
-                "action":"saveContent",
-                "uid":'<?php echo get_current_user_id();?>',
-                "content":content,
-                "docID":'<?php echo $docID;?>'
-            };
-            new SanRequest({
-                type: "post",
-                url: contentUrl,
-                param: JSON.stringify(postData),
-                isShowLoader: false,
-                dataType: "json",
-                callBack: function(res){
-                    if (res.stat === 0) {
-                        alert(res.msg);
-                    }else{
-                        alert(res.msg);
-                    }
+        function checkTabRow(){
+            let docTable = $('#docTable').find("tr");
+            docTable.each(function(){
+                if($(this).attr("class") === "info"){
+                    $(this).removeClass("info");
                 }
             });
         }
@@ -185,6 +235,29 @@ if(!is_user_logged_in()){
                     }else{
                         alert(res.msg);
                         window.location.href = '<?php echo $editorUrl;?>' + "?docID=" + res.id;
+                    }
+                }
+            });
+        }
+        function delDoc(id){
+            let postData = {
+                "action":"delDoc",
+                "uid":'<?php echo get_current_user_id();?>',
+                "docID":id
+            };
+            console.log(postData);
+            new SanRequest({
+                type: "post",
+                url: contentUrl,
+                param: JSON.stringify(postData),
+                isShowLoader: false,
+                dataType: "json",
+                callBack: function(res){
+                    if (res.stat === 0) {
+                        alert(res.msg);
+                    }else{
+                        alert(res.msg);
+                        window.location.href = '<?php echo $docsUrl;?>';
                     }
                 }
             });

@@ -20,12 +20,11 @@ $response = array(
     'msg'=>'未知错误',
     "request"=>$data_json
 );
-if($docID){
-	$user = wp_get_current_user();
-	$uid = $user->ID;
-	$days=get_post_meta($postID, 'down_days', true);
-	if($uid){
-        if($uid == $puid){
+$user = wp_get_current_user();
+$uid = $user->ID;
+if($uid){
+    if($uid == $puid){
+        if($docID){            
             if($action == "getContent"){
                 $getContent = getSanMD($docID);
                 if($getContent){
@@ -59,46 +58,73 @@ if($docID){
                         'msg'=>'保存文档失败'
                     );
                 }
+            }elseif($action == "delDoc"){
+                $del = delDoc($docID);
+                if($del){
+                    $response = array(
+                        'stat'=>'1',
+                        'msg'=>'删除成功'
+                    );
+                }else{
+                    $response = array(
+                        'stat'=>'0',
+                        'msg'=>'删除失败'
+                    );
+                }
+            }
+            
+        }elseif($action == "newDoc"){
+            $title = $data_json['title'];
+            $newDoc = newSanMD($title);
+            if($newDoc){
+                $response = array(
+                    'stat'=>'1',
+                    'msg'=>'创建成功',
+                    "id"=>$newDoc
+                );
+            }elseif($newDoc == 0){
+                $response = array(
+                    'stat'=>'0',
+                    'msg'=>'该标题您已经使用过了'
+                );
+            }else{
+                $response = array(
+                    'stat'=>'0',
+                    'msg'=>'创建失败'
+                );
+            }
+        }elseif($action == "getDocs"){
+            $docs = getAllDocs();
+            if($docs){
+                $response = array(
+                    'stat'=>'1',
+                    'msg'=>'获取成功',
+                    "docs"=>$docs
+                );
+            }else{
+                $response = array(
+                    'stat'=>'0',
+                    'msg'=>'获取失败'
+                );
             }
         }else{
             $response = array(
                 'stat'=>'0',
-                'msg'=>'请勿窃取他人隐私'
+                'msg'=>'没有这个文档'
             );
         }
 
 	}else{
-		$response = array(
-			'stat'=>'0',
-			'msg'=>'用户信息获取失败'
-		);
-    }
-    
-}elseif($action == "newDoc"){
-    $title = $data_json['title'];
-    $newDoc = newSanMD($title);
-    if($newDoc){
-        $response = array(
-            'stat'=>'1',
-            'msg'=>'创建成功',
-            "id"=>$newDoc
-        );
-    }elseif($newDoc == 0){
         $response = array(
             'stat'=>'0',
-            'msg'=>'该标题您已经使用过了'
-        );
-    }else{
-        $response = array(
-            'stat'=>'0',
-            'msg'=>'创建失败'
+            'msg'=>'请勿尝试这种骚操作，否则将会记录在案'
         );
     }
+
 }else{
 	$response = array(
 		'stat'=>'0',
-        'msg'=>'文章ID错误',
-        "docID"=>$docID
+        'msg'=>'抓取用户信息失败'
 	);
 }
 echo json_encode($response);

@@ -56,3 +56,25 @@ function getSanMD($id){
         return false;
     }
 }
+
+function getAllDocs(){
+    global $wpdb;
+    $uid = get_current_user_id();
+    $docs = $wpdb->get_results("Select * From $wpdb->sanmd Where uid = $uid Order by time DESC");
+    if($docs != false){
+        return $docs;
+    }else{
+        return false;
+    }
+}
+
+function delDoc($id){
+    global $wpdb;
+    $uid = get_current_user_id();
+    $isDel = $wpdb->query("Delete From $wpdb->sanmd Where id = $id And uid = $uid");
+    if($isDel != false){
+        return true;
+    }else{
+        return false;
+    }
+}
