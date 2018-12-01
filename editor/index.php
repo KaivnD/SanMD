@@ -11,11 +11,12 @@ $title = htmlentities($_REQUEST['title']);
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo bloginfo('name');?> | MarkDown编辑器</title>
     <link rel="stylesheet" href="<?php getSanMDFile("node_modules/simplemde/dist/simplemde.min.css");?>">
-    <link rel="stylesheet" href="<?php getSanMDFile("statics/modal.css");?>">
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/san.modal.css");?>">
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/font-awesome.min.css");?>">
     <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
     <script src="<?php getSanMDFile("node_modules/simplemde/dist/simplemde.min.js");?>"></script>
-    <script src="<?php getSanMDFile("statics/SanRequest.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
 </head>
 <body>
     <div id="md1" class="modal-frame">
@@ -84,6 +85,7 @@ $title = htmlentities($_REQUEST['title']);
 
         function editorHandle(content){
             var simplemde = new SimpleMDE({
+                autoDownloadFontAwesome:false,
                 autofocus: true,
                 placeholder: "整点动静...",
                 spellChecker:false,
@@ -91,9 +93,10 @@ $title = htmlentities($_REQUEST['title']);
                 renderingConfig:{
                     codeSyntaxHighlighting:true
                 },
-                hideIcons: ["guide"],                    
+                hideIcons: ["guide","unordered-list","ordered-list","quote","heading"],    
+                showIcons: ["code"]                
             });
-            simplemde.toggleFullScreen = true;
+            simplemde.toggleFullScreen();
             let editorToolbar = $(".editor-toolbar");
             editorToolbar.prepend('<i class="separator">|</i>');
             editorToolbar.prepend('<a title="保存" id="saveMD" tabindex="-1" class="fa fa-save"></a>');
