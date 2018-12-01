@@ -7,7 +7,7 @@ function sanMDebug($debug){
 }
 
 function getSanMDFile($file){
-    echo SANMD_URL."/".$file;
+    echo SANMD_URL.$file;
 }
 
 function newSanMD($title,$content = ""){

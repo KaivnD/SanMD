@@ -2,6 +2,10 @@
 require("../../../../wp-load.php");
 $docID = htmlentities($_REQUEST['docID']);
 $title = htmlentities($_REQUEST['title']);
+$editorUrl = SANMD_URL."editor";
+if(!is_user_logged_in()){
+	header("Location: ".wp_login_url($editorUrl));
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -10,15 +14,22 @@ $title = htmlentities($_REQUEST['title']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo bloginfo('name');?> | MarkDown编辑器</title>
-    <link rel="stylesheet" href="<?php getSanMDFile("node_modules/simplemde/dist/simplemde.min.css");?>">
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/simplemde.min.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/san.modal.css");?>">
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/style.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/font-awesome.min.css");?>">
-    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
-    <script src="<?php getSanMDFile("node_modules/simplemde/dist/simplemde.min.js");?>"></script>
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/github.min.css");?>">
+
+    <script src="<?php getSanMDFile("statics/js/highlight.min.js");?>"></script>
+
+    <script src="<?php getSanMDFile("statics/js/simplemde.min.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
 </head>
 <body>
+    <!--loading page-->
+    <div id="loadingPage">
+        <i class="fa fa-spinner fa-spin loadingIcon" aria-hidden="true"></i>
+    </div>
     <div id="md1" class="modal-frame">
             <div class="modal">
                 <div class="modal-inset">
@@ -32,10 +43,10 @@ $title = htmlentities($_REQUEST['title']);
         </div>
     <div class="modal-overlay"></div>
 
-    <script src="https://cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script>
+    <script src="<?php getSanMDFile("statics/js/jquery.min.js");?>"></script>
     <script>
         let contentUrl = "/wp-content/plugins/SanMD/actions/processContents.php";
-
+        let loading = $("#loadingPage");
         let modal = $(".modal-body");
         $modal = $('#md1');
         $overlay = $('.modal-overlay');
@@ -123,6 +134,7 @@ $title = htmlentities($_REQUEST['title']);
                     newDoc(titleVal);
                 });
             });
+            loading.css("display","none");
         }
 
         function saveContent(content){
@@ -166,7 +178,7 @@ $title = htmlentities($_REQUEST['title']);
                         alert(res.msg);
                     }else{
                         alert(res.msg);
-                        window.location.href = "http://localhost/wp-content/plugins/SanMD/editor/?docID=" + res.id;
+                        window.location.href = '<?php echo $editorUrl;?>' + "?docID=" + res.id;
                     }
                 }
             });

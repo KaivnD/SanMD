@@ -18,7 +18,7 @@ $SanMDVersion = "0.1.0";
 $wpdb->sanmd = $wpdb->prefix."sanmd";
 
 define("sanmd",plugin_dir_url( __FILE__ ));
-define('SANMD_URL', plugins_url('', __FILE__));
+define('SANMD_URL', plugins_url('', __FILE__)."/");
 define('SANMD_PATH', dirname( __FILE__ ));
 define('SANMD_SRC', dirname( __FILE__ ).'/statics/');
 

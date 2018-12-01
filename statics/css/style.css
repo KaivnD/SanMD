@@ -1,0 +1,20 @@
+#loadingPage {
+    background-color: #fff;
+    opacity: 1;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3000;
+}
+.loadingIcon {
+    position: fixed;
+    top:50%;
+    left:50%;
+    margin-left: -40px;
+    margin-top: -40px;
+    font-size: 80px !important;
+    color: rgb(104, 104, 104);
+    z-index: 4000;
+}
