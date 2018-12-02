@@ -71,6 +71,20 @@ if($uid){
                         'msg'=>'删除失败'
                     );
                 }
+            }elseif($action == "submitDoc"){
+                $sub = subDoc($docID);
+                if($sub){
+                    $response = array(
+                        'stat'=>'1',
+                        'msg'=>'提交成功',
+                        "parentID"=>$sub
+                    );
+                }else{
+                    $response = array(
+                        'stat'=>'0',
+                        'msg'=>'提交失败'
+                    );
+                }
             }
             
         }elseif($action == "newDoc"){

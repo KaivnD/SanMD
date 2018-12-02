@@ -21,6 +21,8 @@ if(!is_user_logged_in()){
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/font-awesome.min.css");?>">
 
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/bootstrap.min.css");?>">
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/fileinput.min.css");?>">
+
 </head>
 <body>
     <!--loading page-->
@@ -46,14 +48,28 @@ if(!is_user_logged_in()){
                 <div class="panel panel-default">
                     <!-- Default panel contents -->
                     <div class="panel-heading">                        
-                        <button type="button" id="addDoc" class="btn btn-default"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                        <button type="button" id="delDoc" class="btn btn-default"><i class="fa fa-minus" aria-hidden="true"></i></button>
-                        <button type="button" id="editDoc" class="btn btn-default"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                        <button type="button" id="submitDoc" class="btn btn-default"><i class="fa fa-check" aria-hidden="true"></i></button>
+                        <button type="button" id="addDoc" data-toggle="tooltip" data-placement="bottom" title="新建" class="btn btn-default">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="delDoc" data-toggle="tooltip" data-placement="bottom" title="删除" class="btn btn-default">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="editDoc" data-toggle="tooltip" data-placement="bottom" title="编辑" class="btn btn-default">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="submitDoc" data-toggle="tooltip" data-placement="bottom" title="提审" class="btn btn-default">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="mediaBtn" data-toggle="tooltip" data-placement="bottom" title="媒体" class="btn btn-default">
+                            <i class="fa fa-th-large" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="downDoc" data-toggle="tooltip" data-placement="bottom" title="下载" class="btn btn-default">
+                            <i class="fa fa fa-download" aria-hidden="true"></i>
+                        </button>
                         <h3 class="text-right k-panel-title">NCFZ | MarkDown</h3>
                     </div>
                     <div class="panel-body">
-                        <p>...</p>
+                        <p>选择一个文档来编辑或者创建一个吧！</p>
                     </div>
 
                     <table class="table table-hover">
@@ -77,6 +93,9 @@ if(!is_user_logged_in()){
     <script src="<?php getSanMDFile("statics/js/jquery.min.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/bootstrap.min.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/fileinput.min.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/uploadimages.js");?>"></script>
+
 
     <script>
         let contentUrl = "/wp-content/plugins/SanMD/actions/processContents.php";
@@ -88,6 +107,8 @@ if(!is_user_logged_in()){
         let editDoc = $("#editDoc");
         let addDoc = $("#addDoc");
         let delDocBtn = $("#delDoc");
+        let mediaBtn = $("#mediaBtn");
+        let submitDocBtn = $("#submitDoc");
 
         $modal = $('#md1');
         $overlay = $('.modal-overlay');
@@ -125,6 +146,7 @@ if(!is_user_logged_in()){
                         alert(res.msg);
                     }else{
                         setDocs(res.docs);
+                        loading.css("display","none");
                     }
                 }
             });
@@ -166,9 +188,23 @@ if(!is_user_logged_in()){
                         delDoc(selectedRow);
                     }); 
                 }
-
             });
-            loading.css("display","none");
+
+            mediaBtn.click(function (){
+                modal.html("");
+                
+                modal.append('该功能未完善');
+                openModal();
+            });
+
+            submitDocBtn.click(function(){
+                if(selectedRow === undefined){
+                    alert("请选择需要提审的文档");
+                }else{
+                    submitDoc(selectedRow);
+                }
+            });
+            
         };
 
         function setDocs(docs){
@@ -190,7 +226,19 @@ if(!is_user_logged_in()){
                 docTime.innerText = doc.time;
 
                 let docStat = document.createElement('td');
-                docStat.innerText = doc.stat;
+                console.log(doc.stat);
+                if(doc.stat === "1"){
+                    let previewBtn = document.createElement('a');
+                    previewBtn.href = "#";
+                    previewBtn.className = "btn btn-default";
+                    let faEye = document.createElement('i');
+                    faEye.className = "fa fa-eye";
+                    previewBtn.appendChild(faEye);
+                    docStat.appendChild(previewBtn);                                 
+                }else{
+                    docStat.innerText = doc.stat;  
+                }
+
 
                 docRow.appendChild(docIndex);
                 docRow.appendChild(docTitle);
@@ -263,6 +311,29 @@ if(!is_user_logged_in()){
             });
         }
 
+        function submitDoc(id){
+            let postData = {
+                "action":"submitDoc",
+                "uid":'<?php echo get_current_user_id();?>',
+                "docID":id
+            };
+            console.log(postData);
+            new SanRequest({
+                type: "post",
+                url: contentUrl,
+                param: JSON.stringify(postData),
+                isShowLoader: false,
+                dataType: "json",
+                callBack: function(res){
+                    if (res.stat === 0) {
+                        alert(res.msg);
+                    }else{
+                        alert(res.msg);
+                        window.location.href = '<?php echo $docsUrl;?>';
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

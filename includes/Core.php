@@ -78,3 +78,34 @@ function delDoc($id){
         return false;
     }
 }
+
+function subDoc($id){
+    global $wpdb;
+    $uid = get_current_user_id();
+    $doc = getSanMD($id)[0];
+    if($doc){
+        $title = $doc->title;
+        $content = $doc->content;
+        $post = array(
+            'post_title' => $title,        
+            'post_content' => $content,        
+            'post_status' => 'pending',        
+            'post_author' => $uid        
+        );        
+        $postID = wp_insert_post($post);
+        if($postID != false){
+            $updateStat = $wpdb->query("Update $wpdb->sanmd Set stat = 1 , parentID = $postID Where id = $id");
+            if($updateStat){
+                return $postID;
+            }else{
+                return false;
+            }            
+        }else{
+            return false;
+        }
+
+    }else{
+        return false;
+    }
+
+}

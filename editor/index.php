@@ -21,6 +21,7 @@ if(!is_user_logged_in()){
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/font-awesome.min.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/github.min.css");?>">
     <link rel="stylesheet" href="<?php getSanMDFile("statics/css/bootstrap.min.css");?>">
+    <link rel="stylesheet" href="<?php getSanMDFile("statics/css/fileinput.min.css");?>">
 </head>
 <body>
     <!--loading page-->
@@ -44,7 +45,8 @@ if(!is_user_logged_in()){
     <script src="<?php getSanMDFile("statics/js/SanRequest.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/bootstrap.min.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/highlight.min.js");?>"></script>
-
+    <script src="<?php getSanMDFile("statics/js/uploadimages.js");?>"></script>
+    <script src="<?php getSanMDFile("statics/js/fileinput.min.js");?>"></script>
     <script src="<?php getSanMDFile("statics/js/simplemde.min.js");?>"></script>
     <script>
         let contentUrl = "/wp-content/plugins/SanMD/actions/processContents.php";
@@ -98,18 +100,9 @@ if(!is_user_logged_in()){
 
         function editorHandle(content){
             var simplemde = new SimpleMDE({
-                autoDownloadFontAwesome:false,
-                autofocus: true,
-                placeholder: "整点动静...",
-                spellChecker:false,
-                initialValue:content,
-                renderingConfig:{
-                    codeSyntaxHighlighting:true
-                },
-                hideIcons: ["guide","unordered-list","ordered-list","quote","heading"],    
-                showIcons: ["code"]                
+        
             });
-            simplemde.toggleFullScreen();
+            // simplemde.toggleFullScreen();
             let editorToolbar = $(".editor-toolbar");
             editorToolbar.prepend('<i class="separator">|</i>');
             editorToolbar.prepend('<a title="保存" id="saveMD" tabindex="-1" class="fa fa-save"></a>');
