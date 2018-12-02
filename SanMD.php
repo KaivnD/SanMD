@@ -27,7 +27,8 @@ function sanmd_install_action() {
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 	$create_sanmessage_sql = "CREATE TABLE IF NOT EXISTS $wpdb->sanmd (".
-                             "id int(10) unsigned NOT NULL AUTO_INCREMENT,".
+							 "id int(10) unsigned NOT NULL AUTO_INCREMENT,".
+							 "parentID int(255) NOT NULL DEFAULT '0',".
 	                         "stat int(1) NOT NULL DEFAULT '0',".
                              "uid int(10) NOT NULL,".
                              "title varchar(255) NOT NULL,".

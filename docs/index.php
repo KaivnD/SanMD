@@ -5,7 +5,7 @@ $title = htmlentities($_REQUEST['title']);
 $editorUrl = SANMD_URL."editor";
 $docsUrl = SANMD_URL."docs";
 if(!is_user_logged_in()){
-	header("Location: ".wp_login_url($editorUrl));
+	header("Location: ".wp_login_url($docsUrl));
 }
 ?>
 <!DOCTYPE html>
@@ -145,8 +145,10 @@ if(!is_user_logged_in()){
                     if (res.stat === 0) {
                         alert(res.msg);
                     }else{
+                        console.log(res);
                         setDocs(res.docs);
                         loading.css("display","none");
+                        
                     }
                 }
             });
@@ -229,16 +231,20 @@ if(!is_user_logged_in()){
                 console.log(doc.stat);
                 if(doc.stat === "1"){
                     let previewBtn = document.createElement('a');
-                    previewBtn.href = "#";
-                    previewBtn.className = "btn btn-default";
+                    previewBtn.href = '<?php echo home_url();?>' + "/?p=" + doc.parentID + "&preview=yes";
+                    previewBtn.setAttribute("data-toggle","tooltip");
+                    previewBtn.setAttribute("data-placement","bottom");
+                    previewBtn.setAttribute("title","已提交可预览");
+                    // previewBtn.className = "btn btn-default";
                     let faEye = document.createElement('i');
                     faEye.className = "fa fa-eye";
                     previewBtn.appendChild(faEye);
                     docStat.appendChild(previewBtn);                                 
+                }else if(doc.stat === "0"){
+                    docStat.innerText = "未提交";  
                 }else{
                     docStat.innerText = doc.stat;  
                 }
-
 
                 docRow.appendChild(docIndex);
                 docRow.appendChild(docTitle);

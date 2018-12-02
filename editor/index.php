@@ -100,9 +100,18 @@ if(!is_user_logged_in()){
 
         function editorHandle(content){
             var simplemde = new SimpleMDE({
-        
+                autoDownloadFontAwesome:false,
+                autofocus: true,
+                placeholder: "整点动静...",
+                spellChecker:false,
+                initialValue:content,
+                renderingConfig:{
+                    codeSyntaxHighlighting:true
+                },
+                hideIcons: ["guide","unordered-list","ordered-list","quote","heading"],    
+                showIcons: ["code"]                
             });
-            // simplemde.toggleFullScreen();
+            simplemde.toggleFullScreen();
             let editorToolbar = $(".editor-toolbar");
             editorToolbar.prepend('<i class="separator">|</i>');
             editorToolbar.prepend('<a title="保存" id="saveMD" tabindex="-1" class="fa fa-save"></a>');

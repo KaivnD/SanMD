@@ -13,7 +13,7 @@ function getSanMDFile($file){
 function newSanMD($title,$content = ""){
     global $wpdb;
     $uid = get_current_user_id();
-    $checkTitle = $wpdb->get_var("Select * From $wpdb->sanmd Where title = '$title'");
+    $checkTitle = $wpdb->get_var("Select * From $wpdb->sanmd Where title = '$title' And uid = $uid");
     if(!$checkTitle){
         $newMD = $wpdb->query("Insert Into $wpdb->sanmd (uid,title,content) Values ($uid,'$title','$content')");
         if($newMD){
@@ -61,8 +61,17 @@ function getAllDocs(){
     global $wpdb;
     $uid = get_current_user_id();
     $docs = $wpdb->get_results("Select * From $wpdb->sanmd Where uid = $uid Order by time DESC");
-    if($docs != false){
+    if(count($docs) != 0){
         return $docs;
+    }elseif(count($docs) == 0){
+        $title = "Markdown 入门";
+        $getStartDoc = newSanMD($title,file_get_contents("../Readme.md"));
+        if($getStartDoc){
+            $docs = $wpdb->get_results("Select * From $wpdb->sanmd Where uid = $uid Order by time DESC");
+            return $docs;
+        }else{
+            return false;
+        }
     }else{
         return false;
     }
@@ -86,20 +95,36 @@ function subDoc($id){
     if($doc){
         $title = $doc->title;
         $content = $doc->content;
-        $post = array(
-            'post_title' => $title,        
-            'post_content' => $content,        
-            'post_status' => 'pending',        
-            'post_author' => $uid        
-        );        
+        $parentID = $doc->parentID;
+        if($parentID == 0){
+            $post = array(
+                'post_title' => $title,        
+                'post_content' => $content,        
+                'post_status' => 'pending',        
+                'post_author' => $uid        
+            );    
+        }else{
+            $post = array(
+                'ID'=>$parentID,
+                'post_title' => $title,        
+                'post_content' => $content,        
+                'post_status' => 'pending',        
+                'post_author' => $uid        
+            );    
+        }
+    
         $postID = wp_insert_post($post);
         if($postID != false){
-            $updateStat = $wpdb->query("Update $wpdb->sanmd Set stat = 1 , parentID = $postID Where id = $id");
-            if($updateStat){
-                return $postID;
+            if($parentID == 0){
+                $updateStat = $wpdb->query("Update $wpdb->sanmd Set stat = 1 , parentID = $postID Where id = $id");
+                if($updateStat){
+                    return $postID;
+                }else{
+                    return false;
+                }  
             }else{
-                return false;
-            }            
+                return 0;
+            }          
         }else{
             return false;
         }

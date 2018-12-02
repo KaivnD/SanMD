@@ -18,3 +18,7 @@
     color: rgb(104, 104, 104);
     z-index: 4000;
 }
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    vertical-align: center !important;
+}

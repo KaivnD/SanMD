@@ -76,8 +76,12 @@ if($uid){
                 if($sub){
                     $response = array(
                         'stat'=>'1',
-                        'msg'=>'提交成功',
-                        "parentID"=>$sub
+                        'msg'=>'提交成功'
+                    );
+                }elseif($sub == 0){
+                    $response = array(
+                        'stat'=>'1',
+                        'msg'=>'更新成功'
                     );
                 }else{
                     $response = array(
